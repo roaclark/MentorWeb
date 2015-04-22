@@ -119,11 +119,6 @@
 		echo json_encode($result);
 	}//end submitRegForm
 
-	function listMentor(){
-		echo "list Mentor";
-
-	}
-
 	function addMentee() {
 		global $_USER;	
 		$user = $_USER['uid'];
@@ -315,9 +310,7 @@
 		echo json_encode($_POST);
 	}
 
-
-
-	 function getMentor($mentor) {
+	function getMentor($mentor) {
 		$user = $mentor;
 
 		$dbQuery = sprintf("SELECT *
@@ -339,9 +332,9 @@
 		// $checkMentee = sprintf("SELECT first_name, id, mentor_user FROM User, Mentee WHERE User.username = '%s' AND Mentee.username = '%s'", $user, $user);
 		// $isMentee = getDBResultsArray($checkMentee);
 		echo json_encode($result);
-	 }
+	}
 
-	 function listMentors() {
+	function listMatchableMentors() {
 		$dbQuery = "SELECT * FROM USER
 				LEFT JOIN Mentor ON USER.username = Mentor.username
 				LEFT JOIN Mentor_Breadth_Track ON Mentor_Breadth_Track.username = Mentor.username
@@ -351,8 +344,8 @@
 				LEFT JOIN Mentor_International_Experience ON Mentor_International_Experience.username = Mentor.username
 				LEFT JOIN Mentor_Career_Dev_Program ON Mentor_Career_Dev_Program.username = Mentor.username
 				WHERE Mentor.username = USER.username
-					AND (SELECT COUNT(*) FROM Matches
-					WHERE Mentor.username = mentor_user) < (SELECT settingValue FROM GlobalSettings where settingName = 'MaxMenteesPerMentor')"; // breadth_track, student_year, career_dev_program, future_plans, Mentor_BME_Academic_Experience,
+					AND Mentor.approved = 1
+					AND (SELECT COUNT(*) FROM Matches WHERE Mentor.username = mentor_user) < (SELECT settingValue FROM GlobalSettings where settingName = 'MaxMenteesPerMentor')"; // breadth_track, student_year, career_dev_program, future_plans, Mentor_BME_Academic_Experience,
 		$result = getDBResultsArray($dbQuery);
 		echo json_encode($result);
 	}
@@ -1104,7 +1097,10 @@
 		JOIN Mentor_BME_Academic_Experience ON Mentor_BME_Academic_Experience.username = Mentor.username
 		JOIN Mentor_International_Experience ON Mentor_International_Experience.username = Mentor.username
 		JOIN Mentor_Career_Dev_Program ON Mentor_Career_Dev_Program.username = Mentor.username
-		WHERE Wishlist.mentee = '%s' AND (SELECT COUNT(*) FROM Matches WHERE Wishlist.mentor = mentor_user) < (SELECT settingValue FROM GlobalSettings where settingName = 'MaxMenteesPerMentor')", $_USER['uid']);
+		WHERE
+			Wishlist.mentee = '%s'
+			AND Mentor.approved = 1
+			AND (SELECT COUNT(*) FROM Matches WHERE Wishlist.mentor = mentor_user) < (SELECT settingValue FROM GlobalSettings where settingName = 'MaxMenteesPerMentor')", $_USER['uid']);
 		$result=getDBResultsArray($dbQueryWishlist);
 		header("Content-type: application/json");
 		echo json_encode($result);
