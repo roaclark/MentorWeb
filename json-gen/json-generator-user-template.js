@@ -114,7 +114,7 @@
     var myData = data;
     console.log(myData);
     $.ajax({
-      url: "http://dev.m.gatech.edu/d/mosborne8/w/mentoringweb-ng/content/api/gen_faux_users",
+      url: "http://dev.m.gatech.edu/d/schen384/w/mentoringweb-ng/content/api/gen_faux_users",
       dataType: "json",
           async: false,
       data: myData,
@@ -145,4 +145,5 @@
 ]
 
 //Delete mentors not in Admin and Mentee tables.. doesn't work as of right now
+
 DELETE WHERE username not IN (SELECT username FROM Mentee)UNION(SELECT username FROM Admin);
